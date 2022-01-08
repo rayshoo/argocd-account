@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "argocd-account.labels" . | nindent 4 }}
+data:
+  policy.default: role:none
+  policy.csv: |
+    ################### Do not Remove!! ###################
+    p, role:none, *, *, */*, deny
+    p, role:default, applications, get, */*, allow
+    p, role:default, certificates, get, *, allow
+    p, role:default, clusters, get, *, allow
+    p, role:default, repositories, get, *, allow
+    p, role:default, accounts, get, *, allow
+    p, role:default, gpgkeys, get, *, allow
+    {{- range $name := .Values.account}}
+    ################### account: {{ $name.name }} #####################
+    g, role:{{ $name.name }}, role:default
+    g, {{ $name.name }}, role:{{ $name.name }}
+    {{- range $project := .project}}
+    # project: {{ $project }}
+    p, role:{{ $name.name }}, projects, get, {{ $project }}, allow
+    p, role:{{ $name.name }}, applications, *, {{ $project }}/*, allow
+    p, role:{{ $name.name }}, applications, action/*, {{ $project }}/*, allow
+    {{- end }}
+    #######################################################
+    {{- end }}

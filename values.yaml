@@ -1,0 +1,22 @@
+---
+nameOverride: ""
+fullnameOverride: ""
+
+namespace: argocd
+
+account:
+- name: alice
+  enable: true
+  capabilities:
+    login: true
+    apikey: true
+  project:
+  - project1
+- name: greg
+  enable: false
+  capabilities:
+    login: true
+    apikey: false
+  project:
+  - project1
+  - project2

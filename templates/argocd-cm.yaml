@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+    {{- include "argocd-account.labels" . | nindent 4 }}
+data:
+  {{- range .Values.account}}
+  accounts.{{ .name }}: {{ if .capabilities.login }}login{{ end }}
+  {{- if and .capabilities.login .capabilities.apikey -}}, {{ end -}}
+  {{ if .capabilities.apikey }}apiKey{{ end }}
+  accounts.{{ .name }}.enabled: {{ .enable | quote }}
+  {{- end }}
