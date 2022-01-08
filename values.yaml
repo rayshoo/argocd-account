@@ -4,6 +4,9 @@ fullnameOverride: ""
 
 namespace: argocd
 
+admin:
+  enable: false
+
 account:
 - name: alice
   enable: true
@@ -13,7 +16,8 @@ account:
   project:
   - project1
 - name: greg
-  enable: false
+  admin: true
+  enable: true
   capabilities:
     login: true
     apikey: false

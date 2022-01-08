@@ -9,7 +9,7 @@ metadata:
 data:
   policy.default: role:none
   policy.csv: |
-    ################### Do not Remove!! ###################
+    #################### Do not Remove!! ####################
     p, role:none, *, *, */*, deny
     p, role:default, applications, get, */*, allow
     p, role:default, certificates, get, *, allow
@@ -18,8 +18,11 @@ data:
     p, role:default, accounts, get, *, allow
     p, role:default, gpgkeys, get, *, allow
     {{- range $name := .Values.account}}
-    ################### account: {{ $name.name }} #####################
+    #################### account: {{ $name.name }} ####################
     g, role:{{ $name.name }}, role:default
+    {{- if $name.admin }}
+    g, role:{{ $name.name }}, role:admin
+    {{- end }}
     g, {{ $name.name }}, role:{{ $name.name }}
     {{- range $project := .project}}
     # project: {{ $project }}
@@ -27,5 +30,4 @@ data:
     p, role:{{ $name.name }}, applications, *, {{ $project }}/*, allow
     p, role:{{ $name.name }}, applications, action/*, {{ $project }}/*, allow
     {{- end }}
-    #######################################################
     {{- end }}

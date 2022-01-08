@@ -9,6 +9,9 @@ metadata:
     app.kubernetes.io/part-of: argocd
     {{- include "argocd-account.labels" . | nindent 4 }}
 data:
+  {{- if not .Values.admin.enable }}
+  admin.enabled: "false"
+  {{- end }}
   {{- range .Values.account}}
   accounts.{{ .name }}: {{ if .capabilities.login }}login{{ end }}
   {{- if and .capabilities.login .capabilities.apikey -}}, {{ end -}}
