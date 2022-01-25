@@ -1,0 +1,53 @@
+{{ $namespace := .Values.namespace }}
+{{- range .Values.project }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .name }}
+  namespace: {{ $namespace }}
+  labels: {{ include "argocd-account.labels" $ | nindent 4 }}
+spec:
+  {{- if .template }}
+  description: {{ .name }} kubernetes namespace
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: {{ .name }}
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: 'PersistentVolume'
+  clusterResourceBlacklist:
+  - group: '*'
+    kind: Namespace
+  - group: '*'
+    kind: RoleBinding
+  - group: '*'
+    kind: ClusterRoleBinding
+{{- else }}
+  description: {{ .description }}
+{{- if .sourceRepos }}
+  sourceRepos:
+{{- range .sourceRepos }}
+  - {{ . | squote }}
+{{- end }}{{ end }}
+{{- if .destinations }}
+  destinations:
+{{- range .destinations }}
+  - namespace: {{ .namespace | squote }}
+    server: {{ .server | squote }}
+{{- end }}{{ end }}
+{{- if .clusterResourceWhitelist }}
+  clusterResourceWhitelist:
+{{- range .clusterResourceWhitelist }}
+  - group: {{ .group | squote }}
+    kind: {{ .kind | squote }}
+{{- end }}{{ end }}
+{{- if .clusterResourceBlacklist }}
+  clusterResourceBlacklist:
+{{- range .clusterResourceBlacklist }}
+  - group: {{ .group | squote }}
+    kind: {{ .kind | squote }}
+{{- end }}{{ end }}
+{{- end }}{{- end }}

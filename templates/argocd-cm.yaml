@@ -12,9 +12,9 @@ data:
   {{- if not .Values.admin.enable }}
   admin.enabled: "false"
   {{- end }}
-  {{- range .Values.account}}
+  {{- range .Values.account }}
   accounts.{{ .name }}: {{ if .capabilities.login }}login{{ end }}
-  {{- if and .capabilities.login .capabilities.apikey -}}, {{ end -}}
+  {{- if and .capabilities.login .capabilities.apikey -}},{{ end -}}
   {{ if .capabilities.apikey }}apiKey{{ end }}
-  accounts.{{ .name }}.enabled: {{ .enable | quote }}
+  accounts.{{ .name }}.enabled: {{ .enable | squote }}
   {{- end }}

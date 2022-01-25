@@ -4,18 +4,18 @@ kind: ConfigMap
 metadata:
   name: argocd-rbac-cm
   namespace: {{ .Values.namespace }}
-  labels:
-    {{- include "argocd-account.labels" . | nindent 4 }}
+  labels: {{ include "argocd-account.labels" . | nindent 4 }}
 data:
   policy.default: role:none
   policy.csv: |
     #################### Do not Remove!! ####################
     p, role:none, *, *, */*, deny
+    {{- if .Values.all_app_get }}
     p, role:default, applications, get, */*, allow
+    {{- end }}
     p, role:default, certificates, get, *, allow
     p, role:default, clusters, get, *, allow
     p, role:default, repositories, get, *, allow
-    p, role:default, accounts, get, *, allow
     p, role:default, gpgkeys, get, *, allow
     {{- range $name := .Values.account}}
     #################### account: {{ $name.name }} ####################
@@ -29,5 +29,7 @@ data:
     p, role:{{ $name.name }}, projects, get, {{ $project }}, allow
     p, role:{{ $name.name }}, applications, *, {{ $project }}/*, allow
     p, role:{{ $name.name }}, applications, action/*, {{ $project }}/*, allow
+    p, role:{{ $name.name }}, repositories, *, *, allow
+    p, role:{{ $name.name }}, accounts, get, {{ $name.name }}, allow
     {{- end }}
     {{- end }}

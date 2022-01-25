@@ -1,0 +1,12 @@
+{{- if .Values.k8s_sync }}
+{{- range .Values.account }}
+{{ if  .enable }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .name }}
+  namespace: default
+  labels: {{ include "argocd-account.labels" $ | nindent 4 }}
+{{- end }}{{ end }}
+{{- end }}

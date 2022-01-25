@@ -1,0 +1,35 @@
+{{- if .Values.k8s_sync }}
+{{ $accounts := .Values.account }}
+{{- range $project := .Values.project }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ $project.name }}
+  name: {{ $project.name }}
+  labels: {{ include "argocd-account.labels" $ | nindent 4 }}
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $project.name }}
+  namespace: {{ $project.name }}
+  labels: {{ include "argocd-account.labels" $ | nindent 4 }}
+roleRef:
+  kind: Role
+  name: {{ $project.name }}
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+{{- range $account := $accounts }}
+{{- range .project }}
+{{- if eq . $project.name }}
+- kind: ServiceAccount
+  name: {{ $account.name | squote }}
+  namespace: default
+{{- end }}{{ end }}{{ end }}
+{{- end }}
+{{- end }}

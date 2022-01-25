@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  vars:
+    kubeconfig: $HOME/.kube/config
+  vars_files:
+  - values.yaml
+  tasks:
+  - name: Get serviceaccount token on kubernetes cluster
+    shell: |
+      kubectl --kubeconfig={{ kubeconfig }} get secret \
+      $(kubectl --kubeconfig={{ kubeconfig }} get serviceaccount {{ item['name'] }} -o jsonpath={.secrets[0].name}) \
+      -o jsonpath={.data.token} | base64 -d
+    with_items: "{{ account }}"
+    register: result
+    changed_when: false
+
+  - when: item['stdout'] is defined and not not item['stdout']
+    set_fact:
+      tokens: "{{ tokens | default([]) + [{'name':item['item']['name'],'token':item['stdout']}] }}"
+    with_items: "{{ result['results'] }}"
+
+  - name: Alert tokens
+    debug:
+      var: tokens
+    changed_when: true

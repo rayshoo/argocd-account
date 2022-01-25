@@ -3,9 +3,12 @@ nameOverride: ""
 fullnameOverride: ""
 
 namespace: argocd
+k8s_sync: true
 
 admin:
-  enable: false
+  enable: true
+
+all_app_get: false
 
 account:
 - name: alice
@@ -14,7 +17,7 @@ account:
     login: true
     apikey: true
   project:
-  - project1
+  - namespace1
 - name: greg
   admin: true
   enable: true
@@ -22,5 +25,28 @@ account:
     login: true
     apikey: false
   project:
-  - project1
-  - project2
+  - namespace1
+  - namespace2
+
+project:
+- name: namespace1
+  template: true
+### When you try to set it manually, delete the comment below and set the template to false. ###
+# description: namespace1 kubernetes namespace
+# sourceRepos:
+# - '*'
+# destinations:
+# - namespace: namespace1
+#   server: https://kubernetes.default.svc
+# clusterResourceWhitelist:
+# - group: '*'
+#   kind: 'PersistentVolume'
+# clusterResourceBlacklist:
+# - group: '*'
+#   kind: Namespace
+# - group: '*'
+#   kind: RoleBinding
+# - group: '*'
+#   kind: ClusterRoleBinding
+- name: namespace2
+  template: true
